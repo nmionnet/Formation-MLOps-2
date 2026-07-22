@@ -6,7 +6,7 @@ from airflow.sdk import dag, task
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))  # So that airflow can find config files
 
-from dags.config import DATA_FOLDER, GENERATED_DATA_PATH
+from dags.config import DATA_FOLDER, GENERATED_DATA_PATH, PREDICTIONS_FOLDER, MODEL_PATH
 from formation_mlops_2.feature_engineering_io import prepare_features_with_io
 from formation_mlops_2.train_and_predict_io import predict_with_io  # noqa
 
@@ -25,13 +25,12 @@ def predict():
         return features_path
 
     # Start completing predict task
-    def predict_with_io_task():
-        pass
+    @task
+    def predict_with_io_task(features_path):
+        predict_with_io(features_path=features_path, model_path=MODEL_PATH, predictions_folder=PREDICTIONS_FOLDER)
 
     # End completing predict task
-
-    # feature_path = prepare_features_with_io_task() # noqa
-    # predict_with_io_task(feature_path=feature_path) # noqa
-
+    feature_path = prepare_features_with_io_task() # noqa
+    predict_with_io_task(features_path=feature_path) # noqa
 
 predict_dag = predict()
