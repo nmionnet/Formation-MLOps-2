@@ -24,3 +24,20 @@ def predict_with_io(features_path: str, model_path: str, predictions_folder: str
     features[['predictions', 'predictions_time']].to_csv(os.path.join(predictions_folder, time_str + '.csv'),
                                                          index=False)
     features[['predictions', 'predictions_time']].to_csv(os.path.join(predictions_folder, 'latest.csv'), index=False)
+
+
+def shadow_predict_with_io(features_path: str, model_path: str, predictions_folder: str):
+    features = pd.read_parquet(features_path)
+    features = predict(features, model_path)
+    
+    # Load model
+    model = 
+    # Predict with shadow model
+    predictions = model.predict(features)
+    # Compute metrics
+    metrics_df = monitor(predictions)
+    # Send metrics to postgresql
+    engine = create_engine(db_con_str)
+    db_conn = engine.connect()
+    monitoring_df.to_sql(shadow_monitoring_table_name, con=db_conn, if_exists='append', index=False)
+    db_conn.close()
